@@ -16,6 +16,10 @@ const playlistSchema = new Schema(
       maxLength: [300, "Description must be at most 300 characters"],
       required: true,
     },
+    img: {
+      type: String,
+      required: true
+    },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -23,7 +27,7 @@ const playlistSchema = new Schema(
     },
     songs: {
       type: [
-        {
+        { 
           type: mongoose.Schema.ObjectId,
           ref: "Song",
         },
