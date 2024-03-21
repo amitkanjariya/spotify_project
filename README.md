@@ -1,5 +1,1 @@
-# spotify_project
-
-## frontend
-
-## backend
+## Spotify Project
