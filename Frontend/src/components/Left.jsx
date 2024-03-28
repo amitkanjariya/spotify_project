@@ -82,10 +82,10 @@ function Left() {
                 <div className='text-white font-semibold font-Poppins my-5'>
                     &copy; 2024 India, Inc. All rights reserved.
                 </div>
-                <div className=' flex gap-4 my-2'>
-                    <a href='/aboutus' className='font-bold text-neutral-700 hover:text-white duration-100'>About Us</a>
-                    <a href='/contactus' className='font-bold text-neutral-700 hover:text-white duration-100'>Contact Us</a>
-                    <a href='/T&C' className='font-bold text-neutral-700 hover:text-white duration-100'>Terms & Conditions</a>
+                <div className=' flex gap-4 my-2 flex-wrap'>
+                    <a href='https://www.spotify.com/in-en/legal/end-user-agreement/' className='font-bold text-neutral-700 hover:text-white duration-100'>Legal</a>
+                    <a href='https://www.spotify.com/in-en/legal/privacy-policy/' className='font-bold text-neutral-700 hover:text-white duration-100'>Privacy Policy</a>
+                    <a href='https://www.spotify.com/in-en/safetyandprivacy/reporting-content' className='font-bold text-neutral-700 hover:text-white duration-100'>Safety & Privacy Center</a>
                 </div>
             </div>
         </div>

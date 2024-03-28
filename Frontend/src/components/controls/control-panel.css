@@ -1,0 +1,9 @@
+.control-panel {
+    display: flex;
+    justify-content: space-between;
+  }
+.timer {
+    font-size: 14px;
+    font-weight: 200;
+    color: rgb(196, 196, 196);
+}
