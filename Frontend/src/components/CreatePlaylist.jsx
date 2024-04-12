@@ -6,16 +6,45 @@ const CreatePlaylist = () => {
   );
   const [Pname,setPname] = useState("")
   const [fileName, setFileName] = useState("");
+  const [description, setDescription] = useState("");
   const [isCloseIconVisible, setIsCloseIconVisible] = useState(false);
   const inputRef = useRef(null);
   const navigate = useNavigate()
   const handleImageClick = () => {
     inputRef.current.click();
   };
- const pnav = ()=>{
+  function generateBoundary() {
+    return '--------------------------' + Math.floor(Math.random() * 1e15).toString(36);
+  }
+  
+  // Generate a boundary value
+  const boundary = generateBoundary();
+  
+ const pnav = async ()=>{
     if (Pname) {
-      
-       navigate(`/playlist/:${Pname}`)
+       
+        const playlist= {
+           name:Pname,
+           description,
+           img:fileName
+        }
+        const formdata = new FormData()
+        formdata.append('playlist',JSON.stringify(playlist))
+         const response = await fetch("http://localhost:5000/createplaylist",{
+          method:"POST",
+          headers:{
+            "Content-Type":`multipart/form-data; boundary=${boundary}`
+          },
+          body:formdata,
+       })
+         console.log(response)
+         if (!response.ok) {
+            throw new Error("Cannot Create Playlist.")
+         }
+         alert("Playlist Created Successfully.")
+        //  navigate(`/playlist/${Pname}`)
+       
+       
     }
  }
   const handleUpload = (event) => {
@@ -29,7 +58,7 @@ const CreatePlaylist = () => {
     reader.readAsDataURL(file);
     setFileName(file.name);
   };
-
+  // console.log(fileName)
   const handleCloseClick = () => {
     // Implement functionality to close the container here
     navigate("/")
@@ -50,10 +79,10 @@ const CreatePlaylist = () => {
           <img src="../img/close.svg" alt="" className="w-7 h-7 bg-gray-500 rounded-full filter invert p-1" />
         </button>
       )}
-      <div className="text-5xl font-bold p-3 text-gray-700 dark:text-slate-200">
+      <div className="text-5xl font-bold p-3 text-gray-700 dark:text-slate-200 font-Poppins">
         Create Playlist
       </div>
-      <form action="">
+      <form>
         <div className="flex flex-row  p-4 pt-8">
           <div className="" onClick={handleImageClick}>
             <figure className="image-container  mb-8">
@@ -74,12 +103,12 @@ const CreatePlaylist = () => {
             />
             <label
               htmlFor="upload-button"
-              className="block relative bg-black text-white text-xl text-center w-60 py-4 rounded-lg cursor-pointer"
+              className="block relative font-Poppins bg-black text-white text-xl text-center w-60 py-4 rounded-lg cursor-pointer"
             >
               <i className="fas fa-upload"></i> &nbsp; Choose A Photo
             </label>
           </div>
-          <div className="flex flex-col ml-16 w-full  min-w-200px">
+          <div className="flex flex-col ml-16 w-full font-Poppins  min-w-200px">
             <div className="mb-4">
               <label
                 className="block text-slate-200 text-xl font-medium mb-2"
@@ -107,6 +136,8 @@ const CreatePlaylist = () => {
                 rows="6"
                 className="block p-3 w-full text-lg text-gray-900 bg-gray-800 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-100 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-700 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Give your playlist a catchy description..."
+                onChange={(e)=>{setDescription(e.target.value)
+                }}
               ></textarea>
             </div>
           </div>
@@ -114,10 +145,10 @@ const CreatePlaylist = () => {
         <div className="pt-5 flex float-right">
           <button
             href="#"
-            className="px-5 py-2 text-xl font-medium text-center text-white bg-green-500 rounded-lg hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-green-500 dark:hover:bg-green-400 dark:focus:ring-green-500"
+            className="px-5 py-2 text-xl font-medium text-center text-white bg-green-500 rounded-lg hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-green-500 dark:hover:bg-green-400 dark:focus:ring-green-500 font-Poppins"
             onClick = {pnav}
           >
-            create
+            Create
           </button>
         </div>
       </form>

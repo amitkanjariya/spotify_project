@@ -33,8 +33,8 @@ function ControlPanel({ duration, currentTime }) {
 
   return (
     <div className='control-panel'>
-      <div className='timer'>{secondsToHms(currentTime)}</div>
-      <div className='timer'>{secondsToHms(duration)}</div>
+      <div className='timer font-Poppins'>{secondsToHms(currentTime)}</div>
+      <div className='timer font-Poppins'>{secondsToHms(duration)}</div>
     </div>
   )
 }

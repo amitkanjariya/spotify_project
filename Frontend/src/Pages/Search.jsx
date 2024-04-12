@@ -2,29 +2,41 @@ import React from 'react'
 import { Left, Container, Button } from '../components/Index.js'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 function Search() {
-  const playlists = [
-    {
-      name: "LoveMashup",
-      content: "For Love Buddies",
-    },
-    {
-      name: "SadMelodies",
-      content: "Sadness"
-    },
-    {
-      name: "Travel",
-      content: "Travel Time"
-    },
-    {
-      name: "Study",
-      content: "Study Time"
-    },
-    {
-      name: "Lofi",
-      content: "Lofi Time"
+  const [keyword, setkeyword] = useState("")
+  const [playlists, setplaylists] = useState([])
+  const [filteredTrack, setFilteredTrack] = useState([]);
+  useEffect(() => {
+    const fetchsong = async () => {
+      try {
+        const tracks = await fetch('http://localhost:5000/65fee632861108c88f20bf4c/song/fetchsongs', {
+          method: 'GET'
+        })
+        const trackk = await tracks.json()
+        setplaylists(trackk.data)
+        // console.log(trackk.data[0][0].album.images[1].url)
+        // console.log(playlists)
+      }
+      catch (error) {
+        console.error("Error: ", error)
+      }
     }
-  ]
+    fetchsong()
+  }, [])
+  useEffect(() => {
+    // Filter tracks based on keyword
+    if (keyword === "") {
+      setFilteredTrack(playlists);
+    } else {
+      const filtered = playlists.filter(t =>
+        t.album.name.toLowerCase().includes(keyword.toLowerCase()) ||
+        t.artists[0].name.toLowerCase().includes(keyword.toLowerCase())
+      );
+      setFilteredTrack(filtered);
+    }
+
+  }, [keyword, playlists]);
   const changetext = () => {
     const login = document.getElementById("Login")
     login.style.fontSize = "large"
@@ -50,7 +62,7 @@ function Search() {
         <div className='bg-neutral-900 rounded-md p-3 items-center flex justify-between'>
           <div className='flex gap-2 h-12'>
             <img src='.././img/search1.svg' width={30} className='hover:cursor-pointer'></img>
-            <input type='search' placeholder='What do you want to play?' className='rounded-full border-white w-96 text-center' />
+            <input type='search' placeholder='What do you want to play?' className='rounded-full border-white w-96 text-center' value={keyword} onChange={(e) => setkeyword(e.target.value)} />
           </div>
           <div>
 
@@ -81,17 +93,15 @@ function Search() {
           </div>
         </div>
         <div className=' bg-neutral-800 flex flex-col gap-4 h-full overflow-auto rounded-b-lg justify-between'>
-          <p className='font-Poppins text-white font-bold text-2xl mx-5 my-2'>Browse All</p>
+          <p className='font-Poppins text-white font-bold text-2xl mx-5 my-2'>Spotify Songs</p>
           <div className='flex gap-12 flex-wrap  overflow-auto h-64'>
             {
-              playlists.map((playlist, index) => (
-                <Link to='/playlist'>
-                  <div className='flex flex-col gap-2 mx-4 p-4 rounded-md items-center bg-black hover:duration-150 w-40' onMouseOver={() => playchange(index + 1)} onMouseOut={() => playchanges(index + 1)}>
-                    <img src={`.././img/${playlist.name}.jpg`} height={150} className='rounded-md' ></img>
-                    <img src='.././img/play.svg' className='absolute top-80 hidden' id={`play${index + 1}`}></img>
-                    <p className='font-Poppins font-bold text-white'>{playlist.name}</p>
-                    <p className='font-Poppins text-sm font-semibold text-white'>{playlist.content}</p>
-                  </div>
+              filteredTrack.map((playlist, index) => (
+                <Link to={`/song/${playlist.id}`} className='bg-zinc-500 rounded-md h-auto p-4 flex flex-col gap-3 items-center hover:cursor-pointer duration-150' key={index} style={{ flexBasis: '30%', maxWidth: '30%', position: 'relative' }} id='link' onMouseOver={() => playchange(index + 1)} onMouseOut={() => playchanges(index + 1)}>
+                  <img src={playlist.album.images[1].url} className='rounded-md'></img>
+                  <img src='.././img/play.svg' className='absolute top-80 hidden' id={`play${index + 1}`}></img>
+                  <p className='text-white font-Poppins'>{playlist.album.name}</p>
+                  <p className='text-white font-Poppins'>Artist name: {playlist.artists[0].name}</p>
                 </Link>
               ))
             }
@@ -103,16 +113,15 @@ function Search() {
                 <a href='https://www.instagram.com/amit_kanjariya._/' className=' bg-neutral-800 rounded-full p-2' target='_blank'>
                   <img src='.././img/instagram.svg'></img>
                 </a>
-                <a href='https://www.instagram.com/amit_kanjariya._/' className='font-Poppins text-white' target='_blank'>Click here to Contact Us on Instagram</a>
+
               </div>
             </div>
             <div className='flex flex-col gap-5'>
               <p className='font-bold font-Poppins text-white'> Facebook Link</p>
               <div className='flex items-center cursor-pointer gap-1'>
-                <a href='https://www.instagram.com/amit_kanjariya._/' className=' bg-neutral-800 rounded-full p-2' target='_blank'>
+                <a href='https://www.facebook.com/profile.php?id=10009194916420' className=' bg-neutral-800 rounded-full p-2' target='_blank'>
                   <img src='.././img/facebook.svg'></img>
                 </a>
-                <a href='' className='font-Poppins text-white'>Click here to Contact Us on Facebook</a>
               </div>
             </div>
           </div>

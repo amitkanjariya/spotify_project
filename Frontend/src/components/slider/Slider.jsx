@@ -2,24 +2,26 @@ import { useState, useRef, useEffect } from 'react'
 import './slider.css'
 import './thumb.css'
 
-function Slider({ percentage = 0, onChange }) {
+function Slider({ percentage = 0, onChange,onClick }) {
   const [position, setPosition] = useState(0)
   const [marginLeft, setMarginLeft] = useState(0)
   const [progressBarWidth, setProgressBarWidth] = useState(0)
-
   const rangeRef = useRef()
   const thumbRef = useRef()
 
   useEffect(() => {
-    const rangeWidth = rangeRef.current.getBoundingClientRect().width
-    const thumbWidth = thumbRef.current.getBoundingClientRect().width
-    const centerThumb = (thumbWidth / 100) * percentage * -1
-    const centerProgressBar =
-      thumbWidth + (rangeWidth / 100) * percentage - (thumbWidth / 100) * percentage
-    setPosition(percentage)
-    setMarginLeft(centerThumb)
-    setProgressBarWidth(centerProgressBar)
+    if (!isNaN(percentage) && percentage >= 0 && percentage <= 100) {
+      const rangeWidth = rangeRef.current.getBoundingClientRect().width
+      const thumbWidth = thumbRef.current.getBoundingClientRect().width
+      const centerThumb = (thumbWidth / 100) * percentage * -1
+      const centerProgressBar =
+        thumbWidth + (rangeWidth / 100) * percentage - (thumbWidth / 100) * percentage
+      setPosition(percentage)
+      setMarginLeft(centerThumb)
+      setProgressBarWidth(centerProgressBar)
+    }
   }, [percentage])
+  
 
   return (
     <div className='slider-container'>
@@ -44,6 +46,7 @@ function Slider({ percentage = 0, onChange }) {
         step='0.01'
         className='range'
         onChange={onChange}
+        onClick={onClick}
       />
     </div>
   )

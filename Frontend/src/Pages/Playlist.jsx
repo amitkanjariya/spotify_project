@@ -1,28 +1,25 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import ControlPanel from "./controls/ControlPanel";
-import Slider from "./slider/Slider";
+import ControlPanel from "../components/controls/ControlPanel.jsx";
+import Slider from "../components/slider/Slider.jsx";
 import { useNavigate } from "react-router-dom";
-import {
-  BsFillSkipStartCircleFill,
-  BsFillSkipEndCircleFill,
-} from "react-icons/bs";
+import styles from "./Hero.module.css";
+
 import { useParams } from "react-router-dom";
 
 function Player() {
-  const {songname} = useParams()
+  let sindex = 0;
+  const { songname } = useParams();
   const [songs, setSongs] = useState([]);
-  const [index, setIndex] = useState(0);
   const [currentSong, setCurrentSong] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(50);
+  const [vimg, setVimg] = useState(".././img/volume.svg");
   const [percentage, setPercentage] = useState(0);
-  const playlistId = "65fee632861108c88f20bf4c";
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const audioRef = useRef();
-
   useEffect(() => {
     const fetchSongs = async () => {
       try {
@@ -33,49 +30,72 @@ function Player() {
           }
         );
         const trackk = await tracks.json();
-        // console.log(trackk.data[0])
-        setSongs(trackk.data[0]);
-          songs.map((song, i) => {
-            console.log(song);
-            if(song.album.name === songname){
-              setCurrentSong(song);
-              setIndex(i);
-            }
-          })
+        // console.log(trackk.data[0].album)
+        setSongs(trackk.data);
+        songs.map((song, i) => {
+          // console.log(song.id)
+          if (song.id === songname) {
+            sindex = i;
+            setCurrentSong(song);
+            console.log(sindex);
+          }
+        });
 
         // setCurrentSong(trackk.data[0][index]);
-        // console.log(currentSong);
+        console.log(currentSong);
         // console.log(currentSong.album);
       } catch (error) {
         console.error("Error: ", error);
       }
     };
+    // console.log(currentSong.id);
     fetchSongs();
-  }, [songname, currentSong]);
-
+    // setPercentage(0)
+  }, []);
+  const [index, setIndex] = useState(sindex);
+  useEffect(() => {
+    if (currentSong && audioRef.current.currentTime === 0) {
+      audioRef.current.volume = volume / 100; // Set volume when currentSong changes
+    }
+  }, [currentSong, volume]);
+  // console.log(songs.length)
   const handleVolume = (e) => {
     const { value } = e.target;
     const volume = Number(value) / 100;
     audioRef.current.volume = volume;
-    // console.log(volume*100);
+    console.log(volume);
     setVolume(volume * 100);
+    if(volume===0){
+      setVimg(".././img/mute.svg");
+    }
+    else{
+      setVimg(".././img/volume.svg");
+    }
   };
 
   const onChange = (e) => {
     const audio = audioRef.current;
+    // console.log(e.target.value)
+    // console.log(audio.duration)
     audio.currentTime = (audio.duration / 100) * e.target.value;
-    setPercentage(e.target.value);
-  };
-
-  const play = () => {
-    const audio = audioRef.current;
-    audio.volume = 0.1;
-    if (!isPlaying) {
+    // console.log(e.target.value);
+    if (e.target.value === "0") {
+      setIsPlaying(false);
+      audio.pause();
+    } else {
       setIsPlaying(true);
       audio.play();
     }
+    setPercentage(e.target.value);
+  };
+  const play = () => {
+    const audio = audioRef.current;
+    audio.volume = 0.1;
+    setIsPlaying((prev) => !prev);
+    if (!isPlaying) {
+      audio.play();
+    }
     if (isPlaying) {
-      setIsPlaying(false);
       audio.pause();
     }
   };
@@ -91,54 +111,97 @@ function Player() {
   };
 
   const skipBack = () => {
-    if (index == 0) {
-      setIndex(songs.length - 1);
-      setCurrentSong(songs[index]);
-    } else {
-      setIndex(index - 1);
-      setCurrentSong(songs[index]);
-    }
-    navigate(`/song/${currentSong.name}`)
-    audioRef.current.currentTime = 0;
+    setIndex((prevIndex) => {
+      if (prevIndex === 0) {
+        return songs.length - 1;
+      } else {
+        return prevIndex - 1;
+      }
+    });
+    setIsPlaying(false);
+    // console.log(index)
   };
-  // console.log(currentSong.name);
   const skiptoNext = () => {
-    if (index == songs.length - 1) {
-      setIndex(0);
-      setCurrentSong(songs[index]);
-    } else {
-      setIndex(index + 1);
-      setCurrentSong(songs[index]);
-    }
-    navigate(`/song/${currentSong.name}`)
-    audioRef.current.currentTime = 0;
+    setIsPlaying(false);
+    setIndex((prevIndex) => {
+      if (prevIndex === songs.length - 1) {
+        return 0;
+      } else {
+        return prevIndex + 1;
+      }
+    });
+    // console.log(index)
   };
+  useEffect(() => {
+    setCurrentSong(songs[index]);
+    navigate(`/song/${currentSong?.id}`);
+    setPercentage(0);
+  }, [index, songs]);
+  const getRating = () => {
+    let rating = currentSong.popularity ? currentSong.popularity : 0;
+    rating = rating / 10;
+    return rating;
+  };
+  const getArtist = () => {
+    let artistList = "";
+    for (let i = 0; i < currentSong.artists.length - 1; i++) {
+      artistList += `${currentSong.artists[i].name}, `;
+    }
+    artistList += ` ${
+      currentSong.artists[currentSong.artists.length - 1].name
+    }`;
 
+    return artistList;
+  };
+  
   return (
-    <>
+    <div className="bg-black">
       <div>
-        <div className=" w-full max-w-xl h-400  bg-gray-700 border border-gray-900 rounded-lg shadow">
-          <div className="flex pt-4 justify-center items-center">
-            <img
-              className="h-300 me-0 w-300 rounded"
-              src={
-                currentSong
-                  ? currentSong.album.images[1].url
-                  : "https://tailwindcss.com/img/card-top.jpg"
-              }
-              alt="Video preview"
-            />
-            <div className="flex flex-col p-3 pt-1 pr-5 me-auto">
-              <span className="text-md text-gray-500 dark:text-gray-200">
+        <div className="bg-black h-5/6">
+          <section className={styles.container}>
+            <div className={styles.content}>
+              <h1 className={styles.title}>
                 {currentSong ? currentSong.name : "Song Name"}
-              </span>
-              <p className="text-md text-gray-500 dark:text-gray-400">
-                {currentSong
-                  ? currentSong.album.artists[0].name
-                  : "Artist Name"}
+              </h1>
+              <p className={styles.description}>
+                Album Name: {currentSong ? currentSong.album.name : " "}
+              </p>
+              <p className={styles.description}>
+                Artist Name: {currentSong ? getArtist() : " "}
+              </p>
+              <p className={styles.description}>
+                Rating: {currentSong ? `${getRating()}/10` : "0/10"}
+              </p>
+              <p className={styles.description}>
+                Release date:{" "}
+                {currentSong ? currentSong.album.release_date : "Artist Name"}
               </p>
             </div>
-          </div>
+            <div className={styles.imageContainer}>
+              <img
+                src={
+                  currentSong
+                    ? currentSong.album.images[0].url
+                    : ".././img/music.svg"
+                }
+                alt="Song image"
+                className={`${styles.heroImg}`}
+              />
+              <div className={styles.overlay}>
+                
+                <div className={styles.overlayText}>
+                <h2 className="text-green-500 text-3xl  pb-8">
+                    Spotify
+                    <p>
+                     Music for Everyone
+                    </p>
+                </h2>
+                Explore the vibrant world of Spotify, where melodies dance and rhythms sing. Let each track be a doorway to adventure, a gateway to inspiration, in the symphony of your life
+                </div>
+              </div>
+            </div>
+            <div className={styles.topBlur} />
+          </section>
         </div>
 
         <div className="fixed bottom-0 left-0 z-50 grid w-full h-24 grid-cols-1 px-5 bg-white border-t border-gray-200 md:grid-cols-3 dark:bg-black dark:border-gray-600">
@@ -153,10 +216,10 @@ function Player() {
               alt="Video preview"
             />
             <div className="flex flex-col p-3 pt-1 pr-5 me-auto">
-              <span className="text-md text-gray-500 dark:text-gray-200">
+              <span className="text-md text-gray-500 dark:text-gray-200 font-Poppins">
                 {currentSong ? currentSong.name : "Song Name"}
               </span>
-              <p className="text-md text-gray-500 dark:text-gray-400">
+              <p className="text-md text-gray-500 dark:text-gray-400 font-Poppins">
                 {currentSong
                   ? currentSong.album.artists[0].name
                   : "Artist Name"}
@@ -173,7 +236,11 @@ function Player() {
                   onLoadedData={(e) => {
                     setDuration(e.currentTarget.duration.toFixed(2));
                   }}
-                  src={currentSong.preview_url}
+                  onEnded={(e) => {
+                    e.preventDefault();
+                    setIsPlaying(false);
+                  }}
+                  src={currentSong?.preview_url}
                 />
 
                 <div className="flex pt-1.5 w-full justify-center">
@@ -230,13 +297,12 @@ function Player() {
               </div>
               <div>
                 {/* play song and seekbar  */}
-                <Slider percentage={percentage} onChange={onChange} />
-                <ControlPanel
-                  play={play}
-                  isPlaying={isPlaying}
-                  duration={duration}
-                  currentTime={currentTime}
+                <Slider
+                  percentage={percentage}
+                  onChange={onChange}
+                  onClick={play}
                 />
+                <ControlPanel duration={duration} currentTime={currentTime} />
               </div>
             </div>
           </div>
@@ -244,17 +310,9 @@ function Player() {
             <button
               data-tooltip-target="tooltip-volume"
               type="button"
-              className="p-2.5 group rounded-full hover:bg-gray-100 focus:outline-none dark:hover:bg-gray-600"
+              className="p-2.5 group rounded-full focus:outline-none "
             >
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 18"
-              >
-                <path d="M10.836.357a1.978 1.978 0 0 0-2.138.3L3.63 5H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1.63l5.07 4.344a1.985 1.985 0 0 0 2.142.299A1.98 1.98 0 0 0 12 15.826V2.174A1.98 1.98 0 0 0 10.836.357Zm2.728 4.695a1.001 1.001 0 0 0-.29 1.385 4.887 4.887 0 0 1 0 5.126 1 1 0 0 0 1.674 1.095A6.645 6.645 0 0 0 16 9a6.65 6.65 0 0 0-1.052-3.658 1 1 0 0 0-1.384-.29Zm4.441-2.904a1 1 0 0 0-1.664 1.11A10.429 10.429 0 0 1 18 9a10.465 10.465 0 0 1-1.614 5.675 1 1 0 1 0 1.674 1.095A12.325 12.325 0 0 0 20 9a12.457 12.457 0 0 0-1.995-6.852Z" />
-              </svg>
+              <img src={vimg} alt="" />
               <span className="sr-only">Adjust volume</span>
             </button>
             <input
@@ -268,8 +326,7 @@ function Player() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
-
 export default Player;

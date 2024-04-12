@@ -1,17 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 function Signup() {
     const [showPass, setshowPass] = useState(false)
-    const [email, setEmail] = useState("");
+    const [phoneNO, setphoneNO] = useState("");
     const [password, setPassword] = useState("");
-    const [emailError, setEmailError] = useState(false);
+    const [phoneNOError, setphoneNOError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const navigate = useNavigate()
-    const validateEmail = () => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        setEmailError(!emailRegex.test(email) && email !== "");
+    const validatephoneNO = () => {
+        const phoneNOregex = /^\d{10}$/;
+        setphoneNOError(!phoneNOregex.test(phoneNO) && phoneNO !== "");
     };
 
     const validatePassword = () => {
@@ -20,39 +19,36 @@ function Signup() {
     };
     const handleSignup = async (e) => {
         e.preventDefault()
-        validateEmail()
+        validatephoneNO()
         validatePassword()
         const data = {
-            email,
+            phoneNO,
             password
         }
-        // JSON.stringify(data)
-        // console.log(data)
         try {
-            const response = await fetch("http://localhost:5000/signup", {
+            const response = await fetch("http://localhost:5000/signup/phoneno", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             })
-            const dataa = await response.json();
-            // console.log(dataa)
-            if (!response.ok) throw new Error('User cannot Signup')
+            // console.log(response.json())
+            if (!response.ok) throw new Error('User cannot Signup.')
             else {
                 alert("User Signup Successfully.")
-                navigate("/login")
+                navigate("/login/phoneno")
             }
         } catch (error) {
             console.log("Error: ", Error)
         }
     }
     return (
-        <form id="login-form">
+        <form id="login-form" action="post">
             <div className="bg-black text-white font-Figtree">
                 <div className="nav-box bg-black py-5 pl-10 pt-8">
                     <div className="logo">
-                        <img src="img/spotify.svg" className="set-logo cursor-pointer filter invert h-9" alt="Spotify" />
+                        <img src=".././img/spotify.svg" className="set-logo cursor-pointer filter invert h-9" alt="Spotify" />
                     </div>
                 </div>
                 <div className="main flex justify-center items-center">
@@ -62,18 +58,19 @@ function Signup() {
                             <div className="form">
                                 <div className="fieldset mb-4 flex flex-col gap-3">
                                     <div className="label text-sm">
-                                        <label className="username">Email address</label>
+                                        <label className="username">Phone Number:</label>
                                     </div>
                                     <div className="input-username pt-3">
                                         <input className="has-padding take1 has-border bg-black border text-white w-full h-10 px-4 rounded-md"
-                                            type="email"
-                                            placeholder="name@domain.com"
-                                            pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
-                                            value={email}
-                                            name="email"
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            onBlur={validateEmail}
-                                            title={emailError ? "Please enter valid email address" : ""}
+                                            type="phoneNO"
+                                            placeholder="phoneNO:"
+                                            pattern=" /^\d{10}$/"
+                                            value={phoneNO}
+                                            name="phoneNO"
+                                            onChange={(e) => setphoneNO(e.target.value)}
+                                            onBlur={validatephoneNO}
+                                            title={phoneNOError ? "Please enter valid phoneNO no." : ""}
+                                            maxLength={10}
                                             required
                                         />
 
@@ -85,7 +82,7 @@ function Signup() {
                                         <input className="has-padding take1 has-border bg-black border text-white w-full h-10 px-4 rounded-md"
                                             type={showPass ? "text" : "password"}
                                             placeholder="Password"
-                                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%^&*])[A-Za-z\d!@#\$%^&*]{8,}$"
+                                            pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/"
                                             value={password}
                                             name="password"
                                             onChange={(e) => setPassword(e.target.value)}
@@ -101,8 +98,8 @@ function Signup() {
                                         </label>
                                     </div>
                                 </div>
-                                <div className="phone mb-4">
-                                    <a href="/signup/phoneno" className="text-green-600 underline">Use phone number instead.</a>
+                                <div className="phoneNO mb-4">
+                                    <a href="/signup" className="text-green-600 underline">Use email instead.</a>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +110,7 @@ function Signup() {
                         <ul className="social-login">
                             <li className="mb-2">
                                 <button className="social-btn border border-slate-500 rounded-3xl text-white flex items-center justify-center w-full py-2" >
-                                    <img src="img/google.svg" className="set-logo btn-logo cursor-pointer h-6 mr-2" alt="Google" />
+                                    <img src=".././img/google.svg" className="set-logo btn-logo cursor-pointer h-6 mr-2" alt="Google" />
                                     <a className="btn-name" href="https://accounts.google.com/v3/signin/identifier?authuser=0&continue=https%3A%2F%2Fmyaccount.google.com%2F&ec=GAlAwAE&hl=en_GB&service=accountsettings&flowName=GlifWebSignIn&flowEntry=AddSession&dsh=S889392548%3A1710778596054848&theme=glif&ddm=0">Continue with Google</a>
                                 </button>
                             </li>

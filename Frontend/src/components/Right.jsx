@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Button from './Button.jsx'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { logout } from '../store/authslice.js'
 function Right() {
   const authstatus = useSelector((state) => state.auth.status)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [playlists, setplaylists] = useState([])
   useEffect(() => {
     const fetchsong = async () => {
@@ -15,7 +16,8 @@ function Right() {
           method: 'GET'
         })
         const trackk = await tracks.json()
-        setplaylists(trackk.data[0])
+        // console.log(trackk.data)
+        setplaylists(trackk.data)
         // console.log(trackk.data[0][0].album.images[1].url)
         // console.log(playlists)
       }
@@ -44,6 +46,11 @@ function Right() {
   const lgout = (e) => {
     e.preventDefault()
     dispatch(logout())
+  }
+  const navi = (id)=>{
+    console.log(id)
+    console.log(`/song/${id}`)
+   navigate(`/song/${id}`)
   }
   return (
     <div className='flex flex-col  w-full'>
@@ -75,12 +82,15 @@ function Right() {
         <div className='flex gap-10 flex-wrap overflow-auto h-auto w-auto'>
           {
             playlists.map((playlist, index) => (
-              <Link to={`/song/${playlist.album.name}`} className='bg-zinc-500 rounded-md h-auto p-4 flex flex-col gap-3 items-center hover:cursor-pointer duration-150' key={index} style={{ flexBasis: '30%', maxWidth: '30%', position: 'relative' }} id='link' onMouseOver={() => playchange(index + 1)} onMouseOut={() => playchanges(index + 1)}>
+              <div className='bg-zinc-500 rounded-md h-auto p-4 flex flex-col gap-3 items-center hover:cursor-pointer duration-150' key={index} style={{ flexBasis: '30%', maxWidth: '30%', position: 'relative' }} id='link' onMouseOver={() => playchange(index + 1)} onMouseOut={() => playchanges(index + 1)} onClick={(e)=>{
+                // e.preventDefault()
+                navi(playlist.id)
+                }}>
                 <img src={playlist.album.images[1].url} className='rounded-md'></img>
                 <img src='.././img/play.svg' className='absolute top-80 hidden' id={`play${index + 1}`}></img>
                 <p className='text-white font-Poppins'>{playlist.album.name}</p>
                 <p className='text-white font-Poppins'>Artist name: {playlist.artists[0].name}</p>
-              </Link>
+              </div>
             ))
           }
         </div>

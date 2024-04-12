@@ -71,10 +71,10 @@ function Left() {
                             
                     </div>
                     <div className='flex flex-col bg-neutral-800 p-5 text-white gap-3 rounded-md'>
-                        <p className=' text-white font-Poppins font-semibold'>Browse a Album</p>
-                        <small className='font-Poppins text-balance font-semibold'>Browse Your Favourite Album</small>
+                        <p className=' text-white font-Poppins font-semibold'>Browse all Songs</p>
+                        <small className='font-Poppins text-balance font-semibold'>Browse Your Favourite Songs</small>
                             <button className=' w-40 rounded-full font-Poppins font-semibold p-2 text-sm bg-white text-black' type="button" onClick={ba}>
-                                Browse Album
+                                Browse Songs
                             </button>
                      
                     </div>
